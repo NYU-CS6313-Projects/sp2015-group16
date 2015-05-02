@@ -1,9 +1,9 @@
-body {
+#lines {
   font: 10px sans-serif;
 }
 
-.axis path,
-.axis line, 
+.lineaxis path,
+.lineaxis line, 
 .axis1 path,
 .axis1 line {
   fill: none;
@@ -11,11 +11,11 @@ body {
   shape-rendering: crispEdges;
 }
 
-.x.axis path, .x.axis1 path {
+.x.lineaxis path, .x.axis1 path {
   display: none;
 }
 
-.line {
+.lineline {
   fill: none;
   stroke-width: 1.5px;
 }

@@ -41,7 +41,6 @@ var yAxis = d3.svg.axis()
     .ticks(10);
 
 var svgContainer = d3.select("#Bar_plot").append("svg")
-		.attr("class","container")
 		.attr("x",700)
 		.attr("y",200)
 		.attr("width",  width + margin.left + margin.right)

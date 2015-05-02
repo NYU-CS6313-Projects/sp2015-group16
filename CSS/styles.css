@@ -37,31 +37,39 @@
 	  stroke-width: 1.5px;
 	}
 
-	.body {
-		position: relative;
-	}
 
 	#Title {
 		height:50px;
 		padding:10px;
 	}
 
+	div.mapAndbar {
+		height:610px;
+		padding:20px;
+	}
+
 	#Map {
 		/*height:500px;*/
-		width:800px;
+		width:750px;
 		float:left;
 		padding:5px;
 		height: 600px;
 	}
 
 	#Bar_plot {
-		width:300px;
+		width:240px;
 		float:left;
 		padding:10px;
 	}
 
-	#Date_slider {
-		position:relative;
-		top:580px;
-		padding:10px;
+	div#Date_slider {
+/*		position:relative;
+		top:580px;*/
+		padding:20px;
+	}
+
+
+	div#lines {
+		height:700px;
+		padding:20px;
 	}

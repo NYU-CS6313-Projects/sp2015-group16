@@ -4,4 +4,4 @@
 
 **/.ipynb_checkpoints
 **/*.ipynb
-**/*.csv
+data/clean/*.csv
