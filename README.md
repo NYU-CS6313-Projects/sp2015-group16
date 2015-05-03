@@ -1,4 +1,4 @@
-# Visualization of News Bulletins For UNICEF Crisis Operation Center`
+# Visualization of News Bulletins For UNICEF Crisis Operation Center
 
 TODO describe project here
 

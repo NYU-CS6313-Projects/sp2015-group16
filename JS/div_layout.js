@@ -31,33 +31,49 @@ var y = d3.scale.ordinal()
 var x = d3.scale.linear()
 	.range([0,width]);
 
-var xAxis = d3.svg.axis()
+var bar_xAxis = d3.svg.axis()
     .scale(x)
     .orient("bottom");
 
-var yAxis = d3.svg.axis()
+var bar_yAxis = d3.svg.axis()
     .scale(y)
     .orient("left")
     .ticks(10);
 
-var svgContainer = d3.select("#Bar_plot").append("svg")
-		.attr("x",700)
-		.attr("y",200)
-		.attr("width",  width + margin.left + margin.right)
-	    .attr("height",  height + margin.top + margin.bottom)
+// var svgContainer = d3.select("#Bar_plot").append("svg")
+// 		.attr("x",700)
+// 		.attr("y",200)
+// 		.attr("width",  width + margin.left + margin.right)
+// 	    .attr("height",  height + margin.top + margin.bottom)
 
-var svg = svgContainer
-  .append("g")
-    .attr("transform", "translate(" + 50 + "," + margin.top + ")");
+// var svg = svgContainer
+//   .append("g")
+//     .attr("transform", "translate(" + 50 + "," + margin.top + ")");
 
-var fileName = "data/test2.csv";
 
-function type(d) {
-	  d.Count = +d.Count;
-	  return d;
-	}
+
+// function type(d) {
+// 	  d.Count = +d.Count;
+// 	  return d;
+// 	}
 
 var bar_plot = function(file) {
+	var svgContainer = d3.select("#Bar_plot").append("svg")
+			.attr("x",700)
+			.attr("y",200)
+			.attr("width",  width + margin.left + margin.right+30)
+		    .attr("height",  height + margin.top + margin.bottom+300)
+
+	var svg = svgContainer
+	  .append("g")
+	    .attr("transform", "translate(" + 80 + "," + 200 + ")");
+
+	var fileName = "data/test2.csv";
+
+	function type(d) {
+		  d.Count = +d.Count;
+		  return d;
+		}
 	d3.csv(file, type, function(error, data) {
 
 		x.domain([0,d3.max(data,function(d){return d.Count;})]);
@@ -68,7 +84,7 @@ var bar_plot = function(file) {
 		svg.append("g")
 		    .attr("class", "x axis")
 		    .attr("transform", "translate(0," + height + ")")
-		    .call(xAxis)
+		    .call(bar_xAxis)
 		    .append("text")
 		    .attr("x",width+10)
 		    .attr("y", 20)
@@ -78,7 +94,7 @@ var bar_plot = function(file) {
 
 		svg.append("g")
 		    .attr("class", "y axis")
-		    .call(yAxis)
+		    .call(bar_yAxis)
 
 		svg.selectAll(".bar")
 			.data(data)
@@ -91,6 +107,7 @@ var bar_plot = function(file) {
 
 	});
 };
+var fileName = "data/test2.csv";
 bar_plot(fileName);
 
 

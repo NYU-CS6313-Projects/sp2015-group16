@@ -11,7 +11,7 @@
   shape-rendering: crispEdges;
 }
 
-.x.lineaxis path, .x.axis1 path {
+.xx.lineaxis path, .xx.axis1 path {
   display: none;
 }
 

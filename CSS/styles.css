@@ -44,8 +44,8 @@
 	}
 
 	div.mapAndbar {
-		height:610px;
-		padding:20px;
+		height:600px;
+		padding:10px;
 	}
 
 	#Map {
@@ -60,6 +60,7 @@
 		width:240px;
 		float:left;
 		padding:10px;
+		height:400px;
 	}
 
 	div#Date_slider {
@@ -71,5 +72,10 @@
 
 	div#lines {
 		height:700px;
-		padding:20px;
+		padding:40px;
+	}
+
+	div#contact {
+		height:700px;
+		padding:40px;
 	}
