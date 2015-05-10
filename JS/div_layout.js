@@ -63,7 +63,7 @@ var svgContainer = d3.select("#Bar_plot").append("svg")
 
 var svg = svgContainer
 	  .append("g")
-	    .attr("transform", "translate(" + margin.left + "," + margin.top+ ")");
+	    .attr("transform", "translate(" + margin.left + "," + 200+ ")");
 
 var fileName = "data/bar_chart_fillna.csv";
 
@@ -110,7 +110,7 @@ var bar_plot = function(file,index) {
 
 		var svg = svgContainer
 			  	.append("g")
-			    .attr("transform", "translate(" + 150 + "," + margin.top+ ")");
+			    .attr("transform", "translate(" + 150 + "," + 200+ ")");
 
 
 		svg.append("g")
@@ -118,8 +118,8 @@ var bar_plot = function(file,index) {
 			.attr("transform", "translate(0," + 200 + ")")
 			.call(bar_xAxis)
 			.append("text")
-		    .attr("x",width+10)
-		    .attr("y", 20)
+		    .attr("x",300)
+		    .attr("y", 30)
 		    .attr("dy", ".50em")
 		    .style("text-anchor", "end")
 		    .text("Frequency");
@@ -128,7 +128,7 @@ var bar_plot = function(file,index) {
 		    .attr("class", "y axis")
 		    .call(bar_yAxis)
 		    .append("text")
-		    .attr("x",-20)
+		    .attr("x",0)
 		    .attr("y",-10)
 		    .style("text-anchor","end")
 		    .text("Topic")
@@ -154,7 +154,7 @@ formatDate = d3.time.format("%Y-%m-%d");
 
 var margin2 = {top:50,right:70,bottom:50,left:50},
 	width2 = 1100 - margin2.left-margin2.right,
-	height2 = 150 - margin2.bottom - margin2.top;
+	height2 = 110 - margin2.bottom - margin2.top;
 
 // scale function
 var timeScale = d3.time.scale()

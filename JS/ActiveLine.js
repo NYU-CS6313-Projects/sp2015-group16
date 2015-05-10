@@ -103,7 +103,7 @@ var drawline = function(file) {
 
     xScale.domain(d3.extent(data, function(d) { return d.date; })); // extent = highest and lowest points, domain is data, range is bouding box
 
-    yScale.domain([0, 100
+    yScale.domain([0, 5
       //d3.max(categories, function(c) { return d3.max(c.values, function(v) { return v.rating; }); })
     ]);
 
