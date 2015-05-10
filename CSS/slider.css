@@ -1,0 +1,38 @@
+body {
+  font-size: 14px;
+  font-family: 'Raleway', sans-serif;
+}
+
+p {
+  color: black;
+  margin: 50px;
+}
+
+a {
+  color: #4FDEF2;
+}
+.axis {
+  fill: black;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+.axis .halo {
+  stroke: black;
+  stroke-width: 4px;
+  stroke-linecap: round;
+}
+
+.slider .handle path {
+  stroke: black;
+  stroke-width: 3px;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.slider .handle text {
+  fill: black;
+  text-align: center;
+  font-size: 18px;
+}
