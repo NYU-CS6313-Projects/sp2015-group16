@@ -1,6 +1,6 @@
 body {
   font-size: 14px;
-  font-family: 'Raleway', sans-serif;
+/*  font-family: 'Raleway', sans-serif;*/
 }
 
 p {
@@ -8,9 +8,6 @@ p {
   margin: 50px;
 }
 
-a {
-  color: #4FDEF2;
-}
 .axis {
   fill: black;
   -webkit-user-select: none;
