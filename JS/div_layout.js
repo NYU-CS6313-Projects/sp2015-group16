@@ -17,12 +17,14 @@ var basic_choropleth = new Datamap({
 // 		.attr("type","image/svg+xml")
 // 		.attr("data","data/Blank_Map_Pacific_World.svg")
 
+//TODO:  add grid line http://www.d3noob.org/2013/01/adding-grid-lines-to-d3js-graph.html
+
 
 // bar plot
 var margin = {top: 70, right: 20, bottom: 30, left: 20},
     // width = 960 - margin.left - margin.right,
     // height = 500 - margin.top - margin.bottom;
-    width = 300 - margin.left - margin.right,
+    width = 240 - margin.left - margin.right,
     height = 300 - margin.top - margin.bottom;
 
 var y = d3.scale.ordinal()
@@ -96,7 +98,7 @@ var bar_plot = function(file,index) {
 
 
 
-		x.domain([0,30]);
+		x.domain([0,40]);
 
 		y.domain(["political", "conflit", "population displacement",
 			"disaster","food insecurity","disease","water insecurity","fund"]);
@@ -118,7 +120,7 @@ var bar_plot = function(file,index) {
 			.attr("transform", "translate(0," + 200 + ")")
 			.call(bar_xAxis)
 			.append("text")
-		    .attr("x",300)
+		    .attr("x",200)
 		    .attr("y", 30)
 		    .attr("dy", ".50em")
 		    .style("text-anchor", "end")
@@ -225,6 +227,90 @@ handle.append('text')
 
 slider.call(brush.event)
 
+
+function getCentroid(selection) {
+    // get the DOM element from a D3 selection
+    // you could also use "this" inside .each()
+    var element = selection.node(),
+        // use the native SVG interface to get the bounding box
+        bbox = element.getBBox();
+    // return the center of the bounding box
+    return [bbox.x + bbox.width/2, bbox.y + bbox.height/2];
+};
+
+
+
+// slider vs map
+var map = d3.select(".datamaps-subunits").append("g")
+	.attr("class","bubbles");
+d3.csv("data/topic/topic2.csv",function(data){
+    var first = data[0];
+    // get columns
+    var orderedColumns = [];
+    for ( var mug in first ){
+      if ( mug != "Country" && mug != "Code"){
+        orderedColumns.push(mug);
+      }
+    }
+
+    // orderedColumns.sort(sortColumns);
+    // draw city points 
+    for ( var i in data ){
+
+    try {
+    	var projected = getCentroid(d3.select("."+data[i].Code));
+    }
+    catch(err) {
+    	console.log(data[i].Country);
+    	var projected = [0,0];
+    }
+    
+    map.append("circle")
+        .datum( data[i] )
+        .attr("cx",projected[0])
+        .attr("cy",projected[1])
+        .attr("class","topic_2")
+        .attr("r",10)
+        .attr("vector-effect","non-scaling-stroke")
+        // .on("mousemove",function(d){
+        //   hoverData = d;
+        //   setProbeContent(d);
+        //   probe
+        //     .style( {
+        //       "display" : "block",
+        //       "top" : (d3.event.pageY - 80) + "px",
+        //       "left" : (d3.event.pageX + 10) + "px"
+        //     })
+        // })
+        // .on("mouseout",function(){
+        //   hoverData = null;
+        //   probe.style("display","none");
+        // })
+    }
+
+});
+
+function drawBubble(index,tween){
+	var circle = map.selectAll("circle")
+	    .sort(function(a,b){
+	      // catch nulls, and sort circles by size (smallest on top)
+	      if ( isNaN(a[index]) ) a[index] = 0;
+	      if ( isNaN(b[index]) ) b[index] = 0;
+	      return Math.abs(b[index]) - Math.abs(a[index]);
+	    })
+	// 	.attr("class",function(d){
+	// 	return d[m] > 0 ? "gain" : "loss";
+	// })
+	console.log(function(d){return d[index]});
+	circle
+		.transition()
+		.ease("linear")
+		.duration(400)
+		.attr("r",function(d){
+			return 10*d[index]
+	});
+}
+
 function brushed() {
 	var value = brush.extent()[0];
 
@@ -235,39 +321,9 @@ function brushed() {
       //console.log(Math.round((brush.extent()[0] - timeScale.domain()[0]) / 1000 /60/60/24));
 	var index = (Math.round((brush.extent()[0] - timeScale.domain()[0]) / 1000 /60/60/24));
 	bar_plot(fileName, index);
+	// drawBubble(index);
     handle.attr("transform", "translate(" + timeScale(value) + ",0)");
     handle.select('text').text(formatDate(value));
 }
 
-// // slider:
-// var slider2 = d3.select("#Date_slider").append("div")
-// 	.attr("class","sliderContainer")
-// 	.append("div")
-// 	.attr("class","slider");
 
-// // set up an array to hold the months
-// var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-// // lets be fancy for the demo and select the current month.
-// var activeMonth = new Date().getMonth();
-
-// // console.log(activeMonth);
-
-// $(".slider")
-                    
-//     // activate the slider with options
-//     .slider({ 
-//         min: 0, 
-//         max: months.length-1, 
-//         value: activeMonth 
-//     })
-                    
-//     // add pips with the labels set to "months"
-//     .slider("pips", {
-//         rest: "label",
-//         labels: months
-//     })
-                    
-//     // and whenever the slider changes, lets echo out the month
-//     .on("slidechange", function(e,ui) {
-//         $("#labels-months-output").text( "You selected " + months[ui.value] + " (" + ui.value + ")");
-//     });

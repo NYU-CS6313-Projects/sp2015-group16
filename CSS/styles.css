@@ -80,3 +80,9 @@
 		height:700px;
 		padding:40px;
 	}
+
+	circle.topic_2 {
+		fill:#ff0000;
+		stroke:#ffffff;
+		fill-opacity:0.4;
+	}
