@@ -78,9 +78,9 @@ function type(d) {
 
 
 var bar_plot = function(file,index) {
-	console.log(height)
+
 	d3.csv(file, type, function(error, data) {
-		console.log(height)
+
 		
 		Data = data;
 		data = data[index];
@@ -148,6 +148,135 @@ var bar_plot = function(file,index) {
 };
 
 bar_plot(fileName,0);
+
+
+
+
+
+function getCentroid(selection) {
+    // get the DOM element from a D3 selection
+    // you could also use "this" inside .each()
+    var element = selection.node(),
+        // use the native SVG interface to get the bounding box
+        bbox = element.getBBox();
+    // return the center of the bounding box
+    return [bbox.x + bbox.width/2, bbox.y + bbox.height/2];
+};
+
+
+function sortColumns(a,b){
+	// [month,year]
+	a = a.slice(0,10);
+	b = b.slice(0,10);
+	var monthA = a.split("-"),
+	  	monthB = b.split("-");
+	// Y2K !!!
+	// 99 becomes 9; 2000+ becomes 11+
+	var numA = 10000*parseInt(monthA[0])+100*parseInt(monthA[1])+parseInt(monthA[2]);
+	var numB = 10000*parseInt(monthB[0])+100*parseInt(monthB[1])+parseInt(monthB[2]);
+
+	// turn year+month into a sortable number
+	return numA-numB;
+}
+
+
+// slider vs map
+var map = d3.select(".datamaps-subunits").append("g")
+	.attr("class","bubbles");
+
+var orderedColumns = [];
+
+d3.csv("data/topic/topic2.csv",function(data){
+    var first = data[0];
+    // get columns
+
+    for ( var mug in first ){
+      if ( mug != "Country" && mug != "Code"){
+        orderedColumns.push(mug);
+      }
+    }
+
+    orderedColumns.sort(sortColumns);
+    // draw city points 
+    for ( var i in data ){
+
+	    try {
+	    	var projected = getCentroid(d3.select("."+data[i].Code));
+	    }
+	    catch(err) {
+	    	// console.log(data[i].Country);
+	    	var projected = [0,0];
+	    }
+	    // console.log(data[i])
+	    map.append("circle")
+	        .datum(data[i])
+	        .attr("cx",projected[0])
+	        .attr("cy",projected[1])
+	        .attr("class","topic_2")
+	        .attr("id",data[i].Country+"-"+data[i].Code)
+	        .attr("r",1)
+	        .attr("vector-effect","non-scaling-stroke")
+	        .on("click",function(){
+	        	console.log(this.id);
+	        	$(".currentGraph").remove();
+	        	var temp = this.getAttribute("id").split("-");
+		        var countryCode = temp[1]
+		        var countryName = temp[0];
+		        var dir = "data/countries/";
+		        $('#Cname').text(countryName);
+		        var line_file = dir+countryCode+".csv";
+		        drawline(line_file);
+	        })
+	        // .on("mousemove",function(d){
+	        //   hoverData = d;
+	        //   setProbeContent(d);
+	        //   probe
+	        //     .style( {
+	        //       "display" : "block",
+	        //       "top" : (d3.event.pageY - 80) + "px",
+	        //       "left" : (d3.event.pageX + 10) + "px"
+	        //     })
+	        // })
+	        // .on("mouseout",function(){
+	        //   hoverData = null;
+	        //   probe.style("display","none");
+	        // })
+    }
+
+});
+
+$('circle').click(function(){
+        console.log(this.class)
+        $(".currentGraph").remove();
+        var countryCode = this.getAttribute("class").slice(-3);
+        var dir = "data/countries/";
+        $('#Cname').text(countryCode);
+        var line_file = dir+countryCode+".csv";
+        drawline(line_file);
+
+    });
+
+
+function drawBubble(index,tween){
+	var circle = map.selectAll("circle")
+	    .sort(function(a,b){
+	      // catch nulls, and sort circles by size (smallest on top)
+	      if ( isNaN(a[index]) ) a[index] = 0;
+	      if ( isNaN(b[index]) ) b[index] = 0;
+	      return Math.abs(b[index]) - Math.abs(a[index]);
+	    })
+	// 	.attr("class",function(d){
+	// 	return d[m] > 0 ? "gain" : "loss";
+	// })
+	circle
+		.transition()
+		.ease("linear")
+		.duration(100)
+		.attr("r",function(d){
+			return 10*d[index]});
+}
+
+
 
 
 //slider
@@ -228,89 +357,6 @@ handle.append('text')
 slider.call(brush.event)
 
 
-function getCentroid(selection) {
-    // get the DOM element from a D3 selection
-    // you could also use "this" inside .each()
-    var element = selection.node(),
-        // use the native SVG interface to get the bounding box
-        bbox = element.getBBox();
-    // return the center of the bounding box
-    return [bbox.x + bbox.width/2, bbox.y + bbox.height/2];
-};
-
-
-
-// slider vs map
-var map = d3.select(".datamaps-subunits").append("g")
-	.attr("class","bubbles");
-d3.csv("data/topic/topic2.csv",function(data){
-    var first = data[0];
-    // get columns
-    var orderedColumns = [];
-    for ( var mug in first ){
-      if ( mug != "Country" && mug != "Code"){
-        orderedColumns.push(mug);
-      }
-    }
-
-    // orderedColumns.sort(sortColumns);
-    // draw city points 
-    for ( var i in data ){
-
-    try {
-    	var projected = getCentroid(d3.select("."+data[i].Code));
-    }
-    catch(err) {
-    	console.log(data[i].Country);
-    	var projected = [0,0];
-    }
-    
-    map.append("circle")
-        .datum( data[i] )
-        .attr("cx",projected[0])
-        .attr("cy",projected[1])
-        .attr("class","topic_2")
-        .attr("r",10)
-        .attr("vector-effect","non-scaling-stroke")
-        // .on("mousemove",function(d){
-        //   hoverData = d;
-        //   setProbeContent(d);
-        //   probe
-        //     .style( {
-        //       "display" : "block",
-        //       "top" : (d3.event.pageY - 80) + "px",
-        //       "left" : (d3.event.pageX + 10) + "px"
-        //     })
-        // })
-        // .on("mouseout",function(){
-        //   hoverData = null;
-        //   probe.style("display","none");
-        // })
-    }
-
-});
-
-function drawBubble(index,tween){
-	var circle = map.selectAll("circle")
-	    .sort(function(a,b){
-	      // catch nulls, and sort circles by size (smallest on top)
-	      if ( isNaN(a[index]) ) a[index] = 0;
-	      if ( isNaN(b[index]) ) b[index] = 0;
-	      return Math.abs(b[index]) - Math.abs(a[index]);
-	    })
-	// 	.attr("class",function(d){
-	// 	return d[m] > 0 ? "gain" : "loss";
-	// })
-	console.log(function(d){return d[index]});
-	circle
-		.transition()
-		.ease("linear")
-		.duration(400)
-		.attr("r",function(d){
-			return 10*d[index]
-	});
-}
-
 function brushed() {
 	var value = brush.extent()[0];
 
@@ -321,7 +367,8 @@ function brushed() {
       //console.log(Math.round((brush.extent()[0] - timeScale.domain()[0]) / 1000 /60/60/24));
 	var index = (Math.round((brush.extent()[0] - timeScale.domain()[0]) / 1000 /60/60/24));
 	bar_plot(fileName, index);
-	// drawBubble(index);
+	// console.log(index);
+	drawBubble(orderedColumns[index]);
     handle.attr("transform", "translate(" + timeScale(value) + ",0)");
     handle.select('text').text(formatDate(value));
 }

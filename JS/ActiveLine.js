@@ -370,3 +370,4 @@ $('path').click(function(){
         drawline(line_file);
 
     });
+
