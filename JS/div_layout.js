@@ -1,4 +1,3 @@
-
 // map part
 
 var basic_choropleth = new Datamap({
@@ -77,6 +76,144 @@ function type(d) {
 		}
 
 
+
+
+
+
+
+function getCentroid(selection) {
+    // get the DOM element from a D3 selection
+    // you could also use "this" inside .each()
+    var element = selection.node(),
+        // use the native SVG interface to get the bounding box
+        bbox = element.getBBox();
+    // return the center of the bounding box
+    return [bbox.x + bbox.width/2, bbox.y + bbox.height/2];
+};
+
+
+function sortColumns(a,b){
+	// [month,year]
+	a = a.slice(0,10);
+	b = b.slice(0,10);
+	var monthA = a.split("-"),
+	  	monthB = b.split("-");
+	// Y2K !!!
+	// 99 becomes 9; 2000+ becomes 11+
+	var numA = 10000*parseInt(monthA[0])+100*parseInt(monthA[1])+parseInt(monthA[2]);
+	var numB = 10000*parseInt(monthB[0])+100*parseInt(monthB[1])+parseInt(monthB[2]);
+
+	// turn year+month into a sortable number
+	return numA-numB;
+}
+
+
+function sortColumns2(a,b) {
+	return a-b
+}
+
+
+
+// slider vs map
+var map = d3.select(".datamaps-subunits").append("g")
+	.attr("class","bubbles");
+
+var orderedColumns = [];
+
+d3.csv("data/topic/topic2.csv",function(data){
+    var first = data[0];
+    // get columns
+
+    for ( var mug in first ){
+      if ( mug != "Country" && mug != "Code"){
+        orderedColumns.push(mug);
+      }
+    }
+    
+    orderedColumns.sort(sortColumns);
+    // console.log(orderedColumns);
+    // draw city points 
+    for ( var i in data ){
+
+	    try {
+	    	var projected = getCentroid(d3.select("."+data[i].Code));
+	    }
+	    catch(err) {
+	    	// console.log(data[i].Country);
+	    	var projected = [0,0];
+	    }
+	    // console.log(data[i])
+	    map.append("circle")
+	        .datum(data[i])
+	        .attr("cx",projected[0])
+	        .attr("cy",projected[1])
+	        .attr("class","topic2")
+	        .attr("id",data[i].Country+"-"+data[i].Code)
+	        .attr("r",1)
+	        .attr("vector-effect","non-scaling-stroke")
+	        .on("click",function(){
+	        	console.log(this.id);
+	        	$(".currentGraph").remove();
+	        	var temp = this.getAttribute("id").split("-");
+		        var countryCode = temp[1]
+		        var countryName = temp[0];
+		        var dir = "data/countries/";
+		        $('#Cname').text(countryName);
+		        var line_file = dir+countryCode+".csv";
+		        drawline(line_file);
+	        })
+	        // .on("mousemove",function(d){
+	        //   hoverData = d;
+	        //   setProbeContent(d);
+	        //   probe
+	        //     .style( {
+	        //       "display" : "block",
+	        //       "top" : (d3.event.pageY - 80) + "px",
+	        //       "left" : (d3.event.pageX + 10) + "px"
+	        //     })
+	        // })
+	        // .on("mouseout",function(){
+	        //   hoverData = null;
+	        //   probe.style("display","none");
+	        // })
+    } // end of for loop
+
+
+});
+
+$('circle').click(function(){
+        console.log(this.class)
+        $(".currentGraph").remove();
+        var countryCode = this.getAttribute("class").slice(-3);
+        var dir = "data/countries/";
+        $('#Cname').text(countryCode);
+        var line_file = dir+countryCode+".csv";
+        drawline(line_file);
+
+    });
+
+
+function drawBubble(index,tween){
+	console.log("drawing bubbles!")
+	var circle = map.selectAll("circle")
+	    .sort(function(a,b){
+	      // catch nulls, and sort circles by size (smallest on top)
+	      if ( isNaN(a[index]) ) a[index] = 0;
+	      if ( isNaN(b[index]) ) b[index] = 0;
+	      return Math.abs(b[index]) - Math.abs(a[index]);
+	    })
+	// 	.attr("class",function(d){
+	// 	return d[m] > 0 ? "gain" : "loss";
+	// })
+	circle
+		.transition()
+		.ease("linear")
+		.duration(100)
+		.attr("r",function(d){
+			return 10*d[index]});
+}
+
+
 var bar_plot = function(file,index) {
 
 	d3.csv(file, type, function(error, data) {
@@ -87,14 +224,14 @@ var bar_plot = function(file,index) {
         temp = [];
 
 
-		temp.push({Count:data.topic1, Topics:"political"});
-		temp.push({Count:data.topic2, Topics:"conflit"});
-		temp.push({Count:data.topic3, Topics:"population displacement"});
-		temp.push({Count:data.topic4, Topics:"disaster"});
-		temp.push({Count:data.topic5, Topics:"food insecurity"});
-		temp.push({Count:data.topic6, Topics:"disease"});
-		temp.push({Count:data.topic7, Topics:"water insecurity"});
-		temp.push({Count:data.topic8, Topics:"fund"});
+		temp.push({Count:data.topic1, File:"topic1", Topics:"political"});
+		temp.push({Count:data.topic2, File:"topic2", Topics:"conflit"});
+		temp.push({Count:data.topic3, File:"topic3", Topics:"population displacement"});
+		temp.push({Count:data.topic4, File:"topic4", Topics:"disaster"});
+		temp.push({Count:data.topic5, File:"topic5", Topics:"food insecurity"});
+		temp.push({Count:data.topic6, File:"topic6", Topics:"disease"});
+		temp.push({Count:data.topic7, File:"topic7", Topics:"water insecurity"});
+		temp.push({Count:data.topic8, File:"topic8", Topics:"fund"});
 
 
 
@@ -139,10 +276,64 @@ var bar_plot = function(file,index) {
 			.data(temp)
 			.enter().append("rect")
 			.attr("class","bar")
+			.attr("id",function(d){return d.File})
 			.attr("x",2)
 			.attr("width",function(d){return x(d.Count); })
 			.attr("y",function(d){ return y(d.Topics); })
 			.attr("height", y.rangeBand())
+			.on("click",function(){	
+					$("g.bubbles").remove();
+					var map = d3.select(".datamaps-subunits").append("g")
+						.attr("class","bubbles");
+
+					var orderedColumns = [];
+					var Bfile_name = this.getAttribute("id");
+					var Bfile_path = "data/topic/"+Bfile_name+".csv";
+					console.log(Bfile_path);
+					d3.csv(Bfile_path,function(data){
+					    var first = data[0];
+					    // get columns
+
+					    for ( var mug in first ){
+					      if ( mug != "Country" && mug != "Code"){
+					        orderedColumns.push(mug);
+					      }
+					    }
+					    
+					    orderedColumns.sort(sortColumns);
+					    // draw city points 
+					    for ( var i in data ){
+
+						    try {
+						    	var projected = getCentroid(d3.select("."+data[i].Code));
+						    }
+						    catch(err) {
+						    	// console.log(data[i].Country);
+						    	var projected = [0,0];
+						    }
+						    // console.log(data[i])
+						    map.append("circle")
+						        .datum(data[i])
+						        .attr("cx",projected[0])
+						        .attr("cy",projected[1])
+						        .attr("class",Bfile_name)
+						        .attr("id",data[i].Country+"-"+data[i].Code)
+						        .attr("r",10)
+						        .attr("vector-effect","non-scaling-stroke")
+						        .on("click",function(){
+						        	console.log(this.id);
+						        	$(".currentGraph").remove();
+						        	var temp = this.getAttribute("id").split("-");
+							        var countryCode = temp[1]
+							        var countryName = temp[0];
+							        var dir = "data/countries/";
+							        $('#Cname').text(countryName);
+							        var line_file = dir+countryCode+".csv";
+							        drawline(line_file);
+						        })
+					    } // end of for loop
+				});			
+				})
 
 	});
 };
@@ -151,136 +342,32 @@ bar_plot(fileName,0);
 
 
 
+// var timescale2 = d3.time.scale();
+// d3.csv("data/Non-continue/topic2.csv",function(data){
+//     var first = data[0];
+//     // get columns
+
+//     for ( var mug in first ){
+//       if ( mug != "Country" && mug != "Code"){
+//         orderedColumns.push(new Date(mug));
+//       }
+//     }
+//     console.log(orderedColumns);
+//     orderedColumns.sort();
+//     timescale2.domain(orderedColumns).range([0,orderedColumns.length])
+//     console.log(orderedColumns.length)
+    
+// });
+
+// console.log(timescale2(new Date("2013-10-05")));
 
 
-function getCentroid(selection) {
-    // get the DOM element from a D3 selection
-    // you could also use "this" inside .each()
-    var element = selection.node(),
-        // use the native SVG interface to get the bounding box
-        bbox = element.getBBox();
-    // return the center of the bounding box
-    return [bbox.x + bbox.width/2, bbox.y + bbox.height/2];
-};
-
-
-function sortColumns(a,b){
-	// [month,year]
-	a = a.slice(0,10);
-	b = b.slice(0,10);
-	var monthA = a.split("-"),
-	  	monthB = b.split("-");
-	// Y2K !!!
-	// 99 becomes 9; 2000+ becomes 11+
-	var numA = 10000*parseInt(monthA[0])+100*parseInt(monthA[1])+parseInt(monthA[2]);
-	var numB = 10000*parseInt(monthB[0])+100*parseInt(monthB[1])+parseInt(monthB[2]);
-
-	// turn year+month into a sortable number
-	return numA-numB;
-}
-
-
-// slider vs map
-var map = d3.select(".datamaps-subunits").append("g")
-	.attr("class","bubbles");
-
-var orderedColumns = [];
-
-d3.csv("data/topic/topic2.csv",function(data){
-    var first = data[0];
-    // get columns
-
-    for ( var mug in first ){
-      if ( mug != "Country" && mug != "Code"){
-        orderedColumns.push(mug);
-      }
-    }
-
-    orderedColumns.sort(sortColumns);
-    // draw city points 
-    for ( var i in data ){
-
-	    try {
-	    	var projected = getCentroid(d3.select("."+data[i].Code));
-	    }
-	    catch(err) {
-	    	// console.log(data[i].Country);
-	    	var projected = [0,0];
-	    }
-	    // console.log(data[i])
-	    map.append("circle")
-	        .datum(data[i])
-	        .attr("cx",projected[0])
-	        .attr("cy",projected[1])
-	        .attr("class","topic_2")
-	        .attr("id",data[i].Country+"-"+data[i].Code)
-	        .attr("r",1)
-	        .attr("vector-effect","non-scaling-stroke")
-	        .on("click",function(){
-	        	console.log(this.id);
-	        	$(".currentGraph").remove();
-	        	var temp = this.getAttribute("id").split("-");
-		        var countryCode = temp[1]
-		        var countryName = temp[0];
-		        var dir = "data/countries/";
-		        $('#Cname').text(countryName);
-		        var line_file = dir+countryCode+".csv";
-		        drawline(line_file);
-	        })
-	        // .on("mousemove",function(d){
-	        //   hoverData = d;
-	        //   setProbeContent(d);
-	        //   probe
-	        //     .style( {
-	        //       "display" : "block",
-	        //       "top" : (d3.event.pageY - 80) + "px",
-	        //       "left" : (d3.event.pageX + 10) + "px"
-	        //     })
-	        // })
-	        // .on("mouseout",function(){
-	        //   hoverData = null;
-	        //   probe.style("display","none");
-	        // })
-    }
-
-});
-
-$('circle').click(function(){
-        console.log(this.class)
-        $(".currentGraph").remove();
-        var countryCode = this.getAttribute("class").slice(-3);
-        var dir = "data/countries/";
-        $('#Cname').text(countryCode);
-        var line_file = dir+countryCode+".csv";
-        drawline(line_file);
-
-    });
-
-
-function drawBubble(index,tween){
-	var circle = map.selectAll("circle")
-	    .sort(function(a,b){
-	      // catch nulls, and sort circles by size (smallest on top)
-	      if ( isNaN(a[index]) ) a[index] = 0;
-	      if ( isNaN(b[index]) ) b[index] = 0;
-	      return Math.abs(b[index]) - Math.abs(a[index]);
-	    })
-	// 	.attr("class",function(d){
-	// 	return d[m] > 0 ? "gain" : "loss";
-	// })
-	circle
-		.transition()
-		.ease("linear")
-		.duration(100)
-		.attr("r",function(d){
-			return 10*d[index]});
-}
 
 
 
 
 //slider
-formatDate = d3.time.format("%Y-%m-%d");
+formatDate = d3.time.format("%Y-%m-%d")
 
 
 var margin2 = {top:50,right:70,bottom:50,left:50},
@@ -290,6 +377,7 @@ var margin2 = {top:50,right:70,bottom:50,left:50},
 // scale function
 var timeScale = d3.time.scale()
 		.domain([new Date('2013-06-25'), new Date('2015-01-01')])
+		// .domain(orderedColumns)
 		.range([0, width2])
 		.clamp(true);
 
@@ -372,5 +460,4 @@ function brushed() {
     handle.attr("transform", "translate(" + timeScale(value) + ",0)");
     handle.select('text').text(formatDate(value));
 }
-
 
