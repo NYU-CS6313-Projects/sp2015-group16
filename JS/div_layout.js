@@ -76,6 +76,131 @@ function type(d) {
 		}
 
 
+var bar_plot = function(file,index) {
+
+	d3.csv(file, type, function(error, data) {
+
+		
+		Data = data;
+		data = data[index];
+        temp = [];
+
+
+		temp.push({Count:data.topic1, File:"topic1", Topics:"political"});
+		temp.push({Count:data.topic2, File:"topic2", Topics:"conflit"});
+		temp.push({Count:data.topic3, File:"topic3", Topics:"population displacement"});
+		temp.push({Count:data.topic4, File:"topic4", Topics:"disaster"});
+		temp.push({Count:data.topic5, File:"topic5", Topics:"food insecurity"});
+		temp.push({Count:data.topic6, File:"topic6", Topics:"disease"});
+		temp.push({Count:data.topic7, File:"topic7", Topics:"water insecurity"});
+		temp.push({Count:data.topic8, File:"topic8", Topics:"fund"});
+
+
+
+		x.domain([0,40]);
+
+		y.domain(["political", "conflit", "population displacement",
+			"disaster","food insecurity","disease","water insecurity","fund"]);
+
+		d3.select("#bar_container").remove();
+
+		var svgContainer = d3.select("#Bar_plot").append("svg")
+				.attr("id","bar_container")
+				.attr("width",  width + margin.left + margin.right)
+			    .attr("height",  height + margin.top + margin.bottom)
+
+		var svg = svgContainer
+			  	.append("g")
+			    .attr("transform", "translate(" + 150 + "," + 200+ ")");
+
+
+		svg.append("g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0," + 200 + ")")
+			.call(bar_xAxis)
+			.append("text")
+		    .attr("x",200)
+		    .attr("y", 30)
+		    .attr("dy", ".50em")
+		    .style("text-anchor", "end")
+		    .text("Frequency");
+
+		svg.append("g")
+		    .attr("class", "y axis")
+		    .call(bar_yAxis)
+		    .append("text")
+		    .attr("x",0)
+		    .attr("y",-10)
+		    .style("text-anchor","end")
+		    .text("Topic")
+
+		svg.selectAll(".bar")
+			.data(temp)
+			.enter().append("rect")
+			.attr("class","bar")
+			.attr("id",function(d){return d.File})
+			.attr("x",2)
+			.attr("width",function(d){return x(d.Count); })
+			.attr("y",function(d){ return y(d.Topics); })
+			.attr("height", y.rangeBand())
+			.on("click",function(){	
+					$("g.bubbles").remove();
+					var map = d3.select(".datamaps-subunits").append("g")
+						.attr("class","bubbles");
+
+					var orderedColumns = [];
+					var Bfile_name = this.getAttribute("id");
+					var Bfile_path = "data/topic/"+Bfile_name+".csv";
+					console.log(Bfile_path);
+					d3.csv(Bfile_path,function(data){
+					    var first = data[0];
+					    // get columns
+
+					    for ( var mug in first ){
+					      if ( mug != "Country" && mug != "Code"){
+					        orderedColumns.push(mug);
+					      }
+					    }
+					    
+					    orderedColumns.sort(sortColumns);
+					    // draw city points 
+					    for ( var i in data ){
+
+						    try {
+						    	var projected = getCentroid(d3.select("."+data[i].Code));
+						    }
+						    catch(err) {
+						    	// console.log(data[i].Country);
+						    	var projected = [0,0];
+						    }
+						    // console.log(data[i])
+						    map.append("circle")
+						        .datum(data[i])
+						        .attr("cx",projected[0])
+						        .attr("cy",projected[1])
+						        .attr("class",Bfile_name)
+						        .attr("id",data[i].Country+"-"+data[i].Code)
+						        .attr("r",1)
+						        .attr("vector-effect","non-scaling-stroke")
+						        .on("click",function(){
+						        	console.log(this.id);
+						        	$(".currentGraph").remove();
+						        	var temp = this.getAttribute("id").split("-");
+							        var countryCode = temp[1]
+							        var countryName = temp[0];
+							        var dir = "data/countries/";
+							        $('#Cname').text(countryName);
+							        var line_file = dir+countryCode+".csv";
+							        drawline(line_file);
+						        })
+					    } // end of for loop
+				});			
+				})
+
+	});
+};
+
+bar_plot(fileName,0);
 
 
 
@@ -194,8 +319,8 @@ $('circle').click(function(){
 
 
 function drawBubble(index,tween){
-	console.log("drawing bubbles!")
-	var circle = map.selectAll("circle")
+
+	var circle = d3.selectAll("circle")
 	    .sort(function(a,b){
 	      // catch nulls, and sort circles by size (smallest on top)
 	      if ( isNaN(a[index]) ) a[index] = 0;
@@ -205,6 +330,7 @@ function drawBubble(index,tween){
 	// 	.attr("class",function(d){
 	// 	return d[m] > 0 ? "gain" : "loss";
 	// })
+	console.log(circle);
 	circle
 		.transition()
 		.ease("linear")
@@ -212,135 +338,6 @@ function drawBubble(index,tween){
 		.attr("r",function(d){
 			return 10*d[index]});
 }
-
-
-var bar_plot = function(file,index) {
-
-	d3.csv(file, type, function(error, data) {
-
-		
-		Data = data;
-		data = data[index];
-        temp = [];
-
-
-		temp.push({Count:data.topic1, File:"topic1", Topics:"political"});
-		temp.push({Count:data.topic2, File:"topic2", Topics:"conflit"});
-		temp.push({Count:data.topic3, File:"topic3", Topics:"population displacement"});
-		temp.push({Count:data.topic4, File:"topic4", Topics:"disaster"});
-		temp.push({Count:data.topic5, File:"topic5", Topics:"food insecurity"});
-		temp.push({Count:data.topic6, File:"topic6", Topics:"disease"});
-		temp.push({Count:data.topic7, File:"topic7", Topics:"water insecurity"});
-		temp.push({Count:data.topic8, File:"topic8", Topics:"fund"});
-
-
-
-		x.domain([0,40]);
-
-		y.domain(["political", "conflit", "population displacement",
-			"disaster","food insecurity","disease","water insecurity","fund"]);
-
-		d3.select("#bar_container").remove();
-
-		var svgContainer = d3.select("#Bar_plot").append("svg")
-				.attr("id","bar_container")
-				.attr("width",  width + margin.left + margin.right)
-			    .attr("height",  height + margin.top + margin.bottom)
-
-		var svg = svgContainer
-			  	.append("g")
-			    .attr("transform", "translate(" + 150 + "," + 200+ ")");
-
-
-		svg.append("g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(0," + 200 + ")")
-			.call(bar_xAxis)
-			.append("text")
-		    .attr("x",200)
-		    .attr("y", 30)
-		    .attr("dy", ".50em")
-		    .style("text-anchor", "end")
-		    .text("Frequency");
-
-		svg.append("g")
-		    .attr("class", "y axis")
-		    .call(bar_yAxis)
-		    .append("text")
-		    .attr("x",0)
-		    .attr("y",-10)
-		    .style("text-anchor","end")
-		    .text("Topic")
-
-		svg.selectAll(".bar")
-			.data(temp)
-			.enter().append("rect")
-			.attr("class","bar")
-			.attr("id",function(d){return d.File})
-			.attr("x",2)
-			.attr("width",function(d){return x(d.Count); })
-			.attr("y",function(d){ return y(d.Topics); })
-			.attr("height", y.rangeBand())
-			.on("click",function(){	
-					$("g.bubbles").remove();
-					var map = d3.select(".datamaps-subunits").append("g")
-						.attr("class","bubbles");
-
-					var orderedColumns = [];
-					var Bfile_name = this.getAttribute("id");
-					var Bfile_path = "data/topic/"+Bfile_name+".csv";
-					console.log(Bfile_path);
-					d3.csv(Bfile_path,function(data){
-					    var first = data[0];
-					    // get columns
-
-					    for ( var mug in first ){
-					      if ( mug != "Country" && mug != "Code"){
-					        orderedColumns.push(mug);
-					      }
-					    }
-					    
-					    orderedColumns.sort(sortColumns);
-					    // draw city points 
-					    for ( var i in data ){
-
-						    try {
-						    	var projected = getCentroid(d3.select("."+data[i].Code));
-						    }
-						    catch(err) {
-						    	// console.log(data[i].Country);
-						    	var projected = [0,0];
-						    }
-						    // console.log(data[i])
-						    map.append("circle")
-						        .datum(data[i])
-						        .attr("cx",projected[0])
-						        .attr("cy",projected[1])
-						        .attr("class",Bfile_name)
-						        .attr("id",data[i].Country+"-"+data[i].Code)
-						        .attr("r",10)
-						        .attr("vector-effect","non-scaling-stroke")
-						        .on("click",function(){
-						        	console.log(this.id);
-						        	$(".currentGraph").remove();
-						        	var temp = this.getAttribute("id").split("-");
-							        var countryCode = temp[1]
-							        var countryName = temp[0];
-							        var dir = "data/countries/";
-							        $('#Cname').text(countryName);
-							        var line_file = dir+countryCode+".csv";
-							        drawline(line_file);
-						        })
-					    } // end of for loop
-				});			
-				})
-
-	});
-};
-
-bar_plot(fileName,0);
-
-
 
 // var timescale2 = d3.time.scale();
 // d3.csv("data/Non-continue/topic2.csv",function(data){

@@ -81,38 +81,60 @@
 		padding:40px;
 	}
 
+	#topic1 {
+		fill:#48A36D;
+	}
+
+	#topic2 {
+		fill:#E05A6D;
+	}
+
+	#topic4 {
+		fill:#80A8CE;
+	}
+
+	#topic5 {
+		fill:#E37756;
+	}
+	#topic6 {
+		fill:#E3CF6D;
+	}
+	#topic7 {
+		fill:#E39158;
+	}
+
 	circle.topic1 {
 		fill:#48A36D;
 		stroke:#ffffff;
-		fill-opacity:0.4;
+		fill-opacity:0.5;
 	}
 
 	circle.topic2 {
 		fill:#E05A6D;
 		stroke:#ffffff;
-		fill-opacity:0.4;
+		fill-opacity:0.5;
 	}
 
 	circle.topic4 {
 		fill:#80A8CE;
 		stroke:#ffffff;
-		fill-opacity:0.4;
+		fill-opacity:0.5;
 	}
 
 	circle.topic5 {
 		fill:#E37756;
 		stroke:#ffffff;
-		fill-opacity:0.4;
+		fill-opacity:0.5;
 	}
 
 	circle.topic6 {
 		fill:#E3CF6D;
 		stroke:#ffffff;
-		fill-opacity:0.4;
+		fill-opacity:0.5;
 	}
 
 	circle.topic7 {
 		fill:#E39158;
 		stroke:#ffffff;
-		fill-opacity:0.4;
+		fill-opacity:0.5;
 	}
