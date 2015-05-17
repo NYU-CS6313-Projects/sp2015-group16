@@ -358,7 +358,7 @@ var drawline = function(file) {
     return d3.max(maxYValues);
   }
 
-  drawline("data/countries/Afghanistan.csv")
+  drawline("data/countries/AFG.csv")
 
 
 $('path').click(function(){
