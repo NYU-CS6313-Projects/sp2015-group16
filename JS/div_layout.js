@@ -86,21 +86,21 @@ var bar_plot = function(file,index) {
         temp = [];
 
 
-		temp.push({Count:data.topic1, File:"topic1", Topics:"political"});
-		temp.push({Count:data.topic2, File:"topic2", Topics:"conflit"});
-		temp.push({Count:data.topic3, File:"topic3", Topics:"population displacement"});
-		temp.push({Count:data.topic4, File:"topic4", Topics:"disaster"});
-		temp.push({Count:data.topic5, File:"topic5", Topics:"food insecurity"});
-		temp.push({Count:data.topic6, File:"topic6", Topics:"disease"});
-		temp.push({Count:data.topic7, File:"topic7", Topics:"water insecurity"});
-		temp.push({Count:data.topic8, File:"topic8", Topics:"fund"});
+		temp.push({Count:data.topic1, File:"topic1", Topics:"Political"});
+		temp.push({Count:data.topic2, File:"topic2", Topics:"Conflit"});
+		temp.push({Count:data.topic3, File:"topic3", Topics:"Population"});
+		temp.push({Count:data.topic4, File:"topic4", Topics:"Disaster"});
+		temp.push({Count:data.topic5, File:"topic5", Topics:"Food Insecurity"});
+		temp.push({Count:data.topic6, File:"topic6", Topics:"Disease"});
+		temp.push({Count:data.topic7, File:"topic7", Topics:"Water Insecurity"});
+		temp.push({Count:data.topic8, File:"topic8", Topics:"Fund"});
 
 
 
 		x.domain([0,40]);
 
-		y.domain(["political", "conflit", "population displacement",
-			"disaster","food insecurity","disease","water insecurity","fund"]);
+		y.domain(["Political", "Conflit", "Population",
+			"Disaster","Food Insecurity","Disease","Water Insecurity","Fund"]);
 
 		d3.select("#bar_container").remove();
 
