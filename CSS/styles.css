@@ -80,6 +80,10 @@
 		height:700px;
 		padding:40px;
 	}
+	div#acknowledgements {
+		height:300px;
+		padding:40px;
+	}
 
 	#topic1 {
 		fill:#48A36D;
